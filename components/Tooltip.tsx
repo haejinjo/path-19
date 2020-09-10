@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet } from 'react-native';
-import { Text, View } from './Themed';
+import { StyleSheet, Text } from 'react-native';
+import { View } from './Themed';
 import * as Location from 'expo-location';
+import { LocationSchema } from '../constants/Types';
 
 export interface TooltipProps {
-  location: Location.LocationData,
+  location: LocationSchema,
   placeName: string,
 };
 
@@ -12,8 +13,7 @@ export default function Tooltip({ location, placeName }: TooltipProps) {
   const [errorMsg, setErrorMsg] = useState(null);
   const [address, setAddress] = useState<Location.Address | null>(null);
 
-  const getReadableLocation = async ({ coords }: Location.LocationData): Promise<Location.Address> => {
-    const { latitude, longitude } = coords;
+  const getReadableLocation = async ({ latitude, longitude }: LocationSchema): Promise<Location.Address> => {
     try {
       const readableLocation = await Location.reverseGeocodeAsync({ latitude, longitude });
       return readableLocation[0];
@@ -34,9 +34,6 @@ export default function Tooltip({ location, placeName }: TooltipProps) {
     })();
   }, []);
 
-  // Simplify visit timestamp to just day, month, date, year
-  const visitedTimestamp = new Date(location.timestamp).toString().split(' ').slice(0, 4).join(' ');
-
   return !address ?
     (
       <View style={styles.bubble}>
@@ -54,8 +51,8 @@ export default function Tooltip({ location, placeName }: TooltipProps) {
       (
         <View >
           <View style={styles.bubble}>
-            <Text>{"Confirmed Patient"}</Text>
-            <Text>{`Last visited: ${visitedTimestamp}`}</Text>
+            <Text style={{ color: 'black' }}>{"Confirmed Patient"}</Text>
+            <Text>{`Last visited: ${location.date_visited}`}</Text>
             <Text>{placeName}</Text>
           </View>
           <View style={styles.arrowBorder} />

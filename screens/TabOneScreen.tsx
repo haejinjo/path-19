@@ -78,7 +78,12 @@ export default function TabOneScreen() {
   useEffect(() => {
     // Populate locations array with all data from server
     (async () => {
-      setAllLocations(await data.locations);
+      if (error) {
+        console.error(error);
+      } else if (!loading) {
+        setAllLocations(await data.locations);
+        console.log("DATA LOCATION: ", data.locations);
+      }
     })();
 
     // TODO: lazy load locations
@@ -115,14 +120,14 @@ export default function TabOneScreen() {
               longitudeDelta: 0.05
             }}
           >
-            {allLocations.map(({ _id, name, latitude, longitude }) => (
+            {allLocations.map(({ latitude, longitude, _id, name }, index) => (
               <Marker
                 coordinate={{ latitude, longitude }}
                 key={"markerKey" + _id}
                 image={require('../assets/images/redAuraMarker.png')}
               >
                 <Callout tooltip>
-                  <Tooltip location={location} placeName={name} />
+                  <Tooltip location={allLocations[index]} placeName={name} />
                 </Callout>
               </Marker>
             ))}
